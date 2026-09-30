@@ -1,0 +1,32 @@
+# Datadog Agent Helm Values for EKS
+datadog:
+  apiKeyExistingSecret: datadog-secret
+  appKeyExistingSecret: datadog-secret
+  clusterName: bank-prod-eks
+  site: datadoghq.com
+
+  # APM & Tracing
+  apm:
+    portEnabled: true
+    socketEnabled: true
+
+  # Logs collection
+  logs:
+    enabled: true
+    containerCollectAll: true
+
+  # Process & Live Containers
+  processAgent:
+    enabled: true
+    processCollection: true
+
+  # Network Performance Monitoring
+  networkMonitoring:
+    enabled: true
+
+clusterAgent:
+  enabled: true
+  replicas: 2
+  metricsProvider:
+    enabled: true
+    useDatadogMetrics: true

@@ -1,0 +1,46 @@
+# kube-prometheus-stack Production Helm Values
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+    retention: 30d
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp3
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 150Gi
+    resources:
+      requests:
+        cpu: 1000m
+        memory: 4096Mi
+      limits:
+        cpu: 2000m
+        memory: 8192Mi
+
+grafana:
+  enabled: true
+  adminPassword: "ChangeMeInProductionKMS"
+  ingress:
+    enabled: true
+    ingressClassName: istio
+    hosts:
+      - grafana.internal.corp.bank
+  persistence:
+    enabled: true
+    storageClassName: gp3
+    size: 20Gi
+
+alertmanager:
+  alertmanagerSpec:
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp3
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
