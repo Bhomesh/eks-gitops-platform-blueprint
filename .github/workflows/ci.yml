@@ -1,0 +1,63 @@
+name: "EKS Platform CI"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  terraform-validate:
+    name: "Validate Terraform IaC"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.8.5"
+
+      - name: Terraform Format Check
+        run: terraform -chdir=terraform fmt -check -recursive .
+
+      - name: Terraform Validate
+        run: |
+          cd terraform
+          terraform init -backend=false
+          terraform validate
+
+  kustomize-validate:
+    name: "Validate Kustomize Overlays"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v2
+
+      - name: Build Kustomize Dev Overlay
+        run: kustomize build gitops/environments/dev
+
+      - name: Build Kustomize Staging Overlay
+        run: kustomize build gitops/environments/staging
+
+      - name: Build Kustomize Prod Overlay
+        run: kustomize build gitops/environments/prod
+
+  unit-tests:
+    name: "Run Upgrade Orchestrator Unit Tests"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Execute Tests
+        run: python3 -m unittest discover -s tests -p "test_*.py"
