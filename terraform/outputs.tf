@@ -32,3 +32,23 @@ output "public_subnet_ids" {
   description = "List of IDs of public subnets"
   value       = aws_subnet.public[*].id
 }
+
+output "oidc_provider_arn" {
+  description = "OIDC Provider ARN for IRSA"
+  value       = aws_iam_openid_connect_provider.this.arn
+}
+
+output "alb_controller_role_arn" {
+  description = "IAM Role ARN for AWS Load Balancer Controller"
+  value       = aws_iam_role.alb_controller.arn
+}
+
+output "external_dns_role_arn" {
+  description = "IAM Role ARN for ExternalDNS"
+  value       = aws_iam_role.external_dns.arn
+}
+
+output "cert_manager_role_arn" {
+  description = "IAM Role ARN for Cert-Manager"
+  value       = aws_iam_role.cert_manager.arn
+}
