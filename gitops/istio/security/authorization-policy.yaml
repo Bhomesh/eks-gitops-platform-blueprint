@@ -1,0 +1,48 @@
+# 1. Default Deny-All Authorization Policy for Banking Namespace
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: default-deny-all
+  namespace: banking-prod
+spec:
+  {}
+---
+# 2. Allow Ingress Gateway to access Payment Core on HTTP /healthz and /api/v1/*
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-ingress-to-payment
+  namespace: banking-prod
+spec:
+  selector:
+    matchLabels:
+      app: payment-core
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            principals: ["cluster.local/ns/istio-system/sa/istio-ingressgateway-service-account"]
+      to:
+        - operation:
+            methods: ["GET", "POST"]
+            paths: ["/healthz", "/api/v1/*"]
+---
+# 3. Allow Prometheus to scrape metrics
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-prometheus-metrics
+  namespace: banking-prod
+spec:
+  selector:
+    matchLabels:
+      app: payment-core
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            principals: ["cluster.local/ns/monitoring/sa/prometheus-k8s"]
+      to:
+        - operation:
+            methods: ["GET"]
+            paths: ["/metrics"]

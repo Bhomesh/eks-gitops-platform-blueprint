@@ -1,0 +1,19 @@
+# Zero-Trust Strict mTLS Enforcement Across Cluster
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default-strict-mtls
+  namespace: istio-system
+spec:
+  mtls:
+    mode: STRICT
+---
+# Namespace specific strict enforcement for core banking workloads
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: banking-strict-mtls
+  namespace: banking-prod
+spec:
+  mtls:
+    mode: STRICT

@@ -1,0 +1,38 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  namespace: istio-system
+  name: istio-control-plane
+spec:
+  profile: default
+  meshConfig:
+    accessLogFile: /dev/stdout
+    enableAutoMtls: true
+    trustDomain: cluster.local
+    defaultConfig:
+      holdApplicationUntilProxyStarts: true
+      proxyMetadata:
+        ISTIO_META_DNS_CAPTURE: "true"
+        ISTIO_META_DNS_AUTO_ALLOCATE: "true"
+  components:
+    pilot:
+      k8s:
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1024Mi
+        hpaSpec:
+          minReplicas: 2
+          maxReplicas: 5
+    ingressGateways:
+      - name: istio-ingressgateway
+        enabled: true
+        k8s:
+          serviceAnnotations:
+            service.beta.kubernetes.io/aws-load-balancer-type: "external"
+            service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "instance"
+            service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
